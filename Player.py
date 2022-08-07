@@ -1,4 +1,4 @@
-
+import time
 class Player(object):
     def __init__(self,app):
         self.health = 20
@@ -11,15 +11,21 @@ class Player(object):
         self.visable = [([0]*self.visCols) for row in range(self.visRows)]
         
     def refreshPlayerVision(self,app):
-        for visRow in range (40):
-            for visCol in range (40):
+        start = time.time()
+        for visRow in range (self.visRows):
+            for visCol in range (self.visCols):
                 posRow = self.row + visRow
                 posCol = self.col + visCol
-                self.visable[visRow][visCol] = app.map[posRow-20][posCol-20]
+                self.visable[visRow][visCol] = app.world.map[(posRow-self.visRows//2)%app.world.cols][(posCol-self.visCols//2)%app.world.cols]
+        print(f"time take = {(time.time()-start)*1000//1}")
                         
     def move(self,app,dx):
         # oldCol = int((self.x) / app.cellWidth)        
         # self.x += dx
         self.col += dx
+        print(f"moving - {self.col}")
         # newCol = int((self.x) / app.cellWidth)
         # self.col = newCol
+        if self.col < 20:
+            for i in range(dx):
+                app.world.expandMapLeft()

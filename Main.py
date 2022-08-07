@@ -1,10 +1,12 @@
 from cmu_112_graphics import *
 from Player import *
+from Terrain import *
 import random
 def appStarted(app):
     app.rows = 200
     app.cols = 1000
-    createMap(app)
+    app.world = Terrain(app,app.rows,app.cols)
+    app.world.createMap()
     
     app.player = Player(app)
     app.player.refreshPlayerVision(app)
@@ -13,53 +15,21 @@ def appStarted(app):
     app.left = False
     app.right = False
     app.timerDelay = 2
-    
-    
-def createMap(app):
-    app.map = [([0]*app.cols) for row in range(app.rows)]
-    x = 1000000
-    for i in range(75,app.rows):
-        for j in range(app.cols):
-            randNum = random.randint(0,1000000)
-            if app.map[i][j] == 1:
-                continue
-            
-            if randNum >= x:
-                app.map[i][j] = 1
-            if (not j == 0) and (not j == app.cols-1) and (not i == 0):
-                if (app.map[i-1][j-1] == 1 or app.map[i-1][j+1] == 1 
-                    or app.map[i-1][j] == 1):
-                    app.map[i][j] = 1
-                    if randNum >= x//2:
-                        app.map[i-1][j]=1
-            if j == 0 and not i == 0 and app.map[i-1][j+1] == 1:
-                app.map[i][j] = 1
-            if j == app.cols-1 and not i == 0 and app.map[i-1][j-1] == 1:
-                app.map[i][j] = 1
-            x -= 1
-
+                    
     
 def keyPressed(app, event):
     if (event.key == "a"):
         # app.left = True
-        app.player.move(app,-1)
+        app.player.move(app,-10)
     elif (event.key == "d"): 
         # app.right = True
-        app.player.move(app,+1)
-    app.player.refreshPlayerVision(app)
+        app.player.move(app,+10)
+    # app.player.refreshPlayerVision(app)
         
-# def keyReleased(app, event):
-#     if (event.key == "a"):
-#         app.left = False
-#     elif (event.key == "d"): 
-#         app.right = False
         
 def timerFired(app):
     app.player.refreshPlayerVision(app)
-#     if app.left:
-#         app.player.move(app,-1)
-#     elif app.right:
-#         app.player.move(app,1)
+    
         
 def getCell(app, x, y):
     # aka "viewToModel"
@@ -91,9 +61,14 @@ def drawPlayer(app,canvas):
     x0,y0,x1,y1 = getCellBounds(app,20,20)
     canvas.create_rectangle(x0,y0,x1,y1,fill="red")
     
-    
+def drawCoords(app,canvas):
+    canvas.create_text(app.width/2,0,
+                       text=f"x: {app.player.col}\ny: {app.player.row}",
+                       anchor="n")
+
 def redrawAll(app,canvas):
     drawVisable(app,canvas)
     drawPlayer(app,canvas)
+    drawCoords(app,canvas)
 
 runApp(width=600, height=600)
