@@ -1,12 +1,19 @@
 from cmu_112_graphics import *
 from Player import *
 from Terrain import *
+from Block import *
 import random
+
 def appStarted(app):
     app.rows = 200
     app.cols = 1000
+    
+    layers = [(75,Block("dirt",10,"brown")),
+              (100,Block("stone",20,"gray")),
+              (150,Block("deep stone",30,"dark gray")),
+              (180,Block("bedrock",1000,"black"))]
     app.world = Terrain(app,app.rows,app.cols)
-    app.world.createMap()
+    app.world.createMap(layers)
     
     app.player = Player(app)
     app.player.refreshPlayerVision(app)
@@ -50,7 +57,7 @@ def getCellBounds(app, row, col):
 def drawVisable(app,canvas):
     for row in range(len(app.player.visable)):
         for col in range(len(app.player.visable[0])):
-            color = "gray" if app.player.visable[row][col] == 1 else "blue"
+            color = app.player.visable[row][col].color
             x0,y0,x1,y1 = getCellBounds(app,row,col)
             canvas.create_rectangle(x0,y0,x1,y1,fill=color)
 
