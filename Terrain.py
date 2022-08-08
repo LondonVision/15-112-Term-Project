@@ -4,7 +4,7 @@ class Terrain(object):
     def __init__(self,app,rows,cols):
         self.rows = rows
         self.cols = cols
-        self.map = [([Block("sky",0,"light blue",False)]*self.cols) for row in range(self.rows)]
+        self.map = [([Block("sky",0,"SkyBlue1",False,False)]*self.cols) for row in range(self.rows)]
     
     def createLevel(self,heighest,block):
         x = 1000000
@@ -36,22 +36,28 @@ class Terrain(object):
         
     def expandMapLeft(self):
         print("expanding map")
-        randNum = random.randint(0,1000000)
-        x=0
-        for i in range(len(self.rows)):
+        for i in range(self.rows):
+            randNum = random.randint(0,10)
             if i == 0:
-                self.map[0].insert(0,0)
-            elif self.map[i-1][0] == 1:
-                self.map[i].insert(0,1)
-            elif self.map[i][0] == 1:
-                if randNum<=500000:
-                    self.map[i].insert(0,1)
-                elif randNum<750000:
-                    self.map[i].insert(0,1)
-                    self.map[i+1][0] = 1
-                else:
-                    self.map[i].insert(0,0)
-            else:
-                x+=1
-                self.map[i].insert(0,0)
-        print(x)
+                self.map[0].insert(0,Block("sky",0,"SkyBlue1",False))
+            if i == self.rows-1:
+                self.map[0].insert(0,Block("bedrock",1000,"gray4",True,False))
+            # else:
+                # self.map[i].insert(0,self.map[i][0])
+                # print(f"rows: {len(self.map)}\ncols: {len(self.map[0])}")
+            if randNum<=4:#stay even
+                self.map[i].insert(0,self.map[i][0])
+            elif randNum<=7:#increase terrain
+                self.map[i].insert(0,self.map[i][0])
+                self.map[i-1][0] = self.map[i][0]
+            else: #decrease terrain
+                self.map[i].insert(0,self.map[i-1][0])
+            if i>75 and i<77 and self.map[i][0].solid:
+                self.map[i][0] = Block("dirt",10,"tan4")
+            if i <75 and self.map[i][0].solid:
+                self.map[i][0] = Block("sky",0,"SkyBlue1",False)
+                
+            
+            # else:
+            #     x+=1
+            #     self.map[i].insert(0,0)

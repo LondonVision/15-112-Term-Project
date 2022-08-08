@@ -8,10 +8,10 @@ def appStarted(app):
     app.rows = 200
     app.cols = 1000
     
-    layers = [(75,Block("dirt",10,"brown")),
-              (100,Block("stone",20,"gray")),
-              (150,Block("deep stone",30,"dark gray")),
-              (180,Block("bedrock",1000,"black"))]
+    layers = [(75,Block("dirt",10,"tan4")),
+              (85,Block("stone",20,"light slate gray")),
+              (125,Block("deep stone",30,"gray20")),
+              (180,Block("bedrock",1000,"gray4",True,False))]
     app.world = Terrain(app,app.rows,app.cols)
     app.world.createMap(layers)
     
@@ -19,25 +19,24 @@ def appStarted(app):
     app.player.refreshPlayerVision(app)
     app.cellWidth = app.width / app.player.visCols
     
-    app.left = False
-    app.right = False
-    app.timerDelay = 2
+    # app.timerDelay = 2
                     
     
 def keyPressed(app, event):
     if (event.key == "a"):
-        # app.left = True
         app.player.move(app,-10)
     elif (event.key == "d"): 
-        # app.right = True
         app.player.move(app,+10)
-    # app.player.refreshPlayerVision(app)
-        
+    if (event.key == "Space"):
+        app.player.jump(app)
+    if (event.key == "Down"): #TODO this is temperary - gravity will do this
+        app.player.row += 1
+        app.player.refreshPlayerVision(app)
         
 def timerFired(app):
-    app.player.refreshPlayerVision(app)
-    
-        
+    # app.player.refreshPlayerVision(app)
+    pass
+     
 def getCell(app, x, y):
     # aka "viewToModel"
     # return (row, col) in which (x, y) occurred or (-1, -1) if outside grid.
