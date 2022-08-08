@@ -18,19 +18,24 @@ def appStarted(app):
     
     app.player = Player(app)
     app.player.refreshPlayerVision(app)
+    app.invOpen = False
+    
     app.cellWidth = app.width / app.player.visCols
                         
     
 def keyPressed(app, event):
     if (event.key == "a"):
-        app.player.move(app,-10)
-    elif (event.key == "d"): 
-        app.player.move(app,+10)
+        app.player.move(app,-1)
+    if (event.key == "d"): 
+        app.player.move(app,+1)
     if (event.key == "Space"):
         app.player.jump(app)
     if (event.key == "Down"): #TODO this is temperary - gravity will do this
         app.player.row += 1
         app.player.refreshPlayerVision(app)
+    if (event.key == "e"):
+        app.invOpen = not app.invOpen
+    
 
 def mousePressed(app,event):
     row,col = getCell(app,event.x,event.y)
@@ -49,27 +54,27 @@ def getCell(app, x, y): #https://www.cs.cmu.edu/~112/notes/notes-animations-part
     col = int((x) / app.cellWidth)
     return (row, col)
 
-def getCellBounds(app, row, col): #same as above
+def getCellBounds(app, row, col,width): #same link as above
     # aka "modelToView"
     # returns (x0, y0, x1, y1) corners/bounding box of given cell in grid
-    x0 = col * app.cellWidth
-    x1 = (col+1) * app.cellWidth
-    y0 = row * app.cellWidth
-    y1 = (row+1) * app.cellWidth
+    x0 = col * width
+    x1 = (col+1) * width
+    y0 = row * width
+    y1 = (row+1) * width
     return (x0, y0, x1, y1)
 
 def drawVisable(app,canvas):
     for row in range(len(app.player.visable)):
         for col in range(len(app.player.visable[0])):
             color = app.player.visable[row][col].color
-            x0,y0,x1,y1 = getCellBounds(app,row,col)
+            x0,y0,x1,y1 = getCellBounds(app,row,col,app.cellWidth)
             canvas.create_rectangle(x0,y0,x1,y1,fill=color)
 
 def drawPlayer(app,canvas):
     # w = app.cellWidth/2
     # canvas.create_rectangle(app.player.x-w,app.player.y-w,
                             # app.player.x+w,app.player.y+w,fill="red")
-    x0,y0,x1,y1 = getCellBounds(app,20,20)
+    x0,y0,x1,y1 = getCellBounds(app,20,20,app.cellWidth)
     canvas.create_rectangle(x0,y0,x1,y1,fill="red")
     
 def drawCoords(app,canvas):
@@ -77,9 +82,25 @@ def drawCoords(app,canvas):
                        text=f"x: {app.player.col}\ny: {app.player.row}",
                        anchor="n")
 
+def drawInventory(app,canvas):
+    for row in range(len(app.player.inventory)):
+        for col in range(len(app.player.inventory[0])):
+            (block,amount) = app.player.inventory[row][col]
+            color = "LightBlue3"
+            if not block == None:
+                color = block.color
+            if amount == 0:
+                amount = ""
+            x0,y0,x1,y1 = getCellBounds(app,row,col,app.cellWidth*2)
+            canvas.create_rectangle(x0,y0,x1,y1,fill="LightBlue3")
+            canvas.create_rectangle(x0+4,y0+4,x1-4,y1-4,fill=color,outline=color)
+            canvas.create_text((x0+x1)/2,(y0+y1)/2,text=amount)
+            
 def redrawAll(app,canvas):
     drawVisable(app,canvas)
     drawPlayer(app,canvas)
     drawCoords(app,canvas)
+    if app.invOpen:
+        drawInventory(app,canvas)
 
 runApp(width=600, height=600)
