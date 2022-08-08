@@ -2,25 +2,24 @@ from cmu_112_graphics import *
 from Player import *
 from Terrain import *
 from Block import *
-import random
+import random,sys
 
 def appStarted(app):
+    sys.setrecursionlimit(1500) #https://stackoverflow.com/questions/3323001/what-is-the-maximum-recursion-depth-in-python-and-how-to-increase-it
     app.rows = 200
     app.cols = 1000
     
-    layers = [(75,Block("dirt",10,"tan4")),
-              (85,Block("stone",20,"light slate gray")),
-              (125,Block("deep stone",30,"gray20")),
+    app.layers = [(75,Block("dirt",5,"tan4")),
+              (85,Block("stone",10,"light slate gray")),
+              (125,Block("deep stone",20,"gray20")),
               (180,Block("bedrock",1000,"gray4",True,False))]
     app.world = Terrain(app,app.rows,app.cols)
-    app.world.createMap(layers)
+    app.world.createMap(app.layers)
     
     app.player = Player(app)
     app.player.refreshPlayerVision(app)
     app.cellWidth = app.width / app.player.visCols
-    
-    # app.timerDelay = 2
-                    
+                        
     
 def keyPressed(app, event):
     if (event.key == "a"):
@@ -43,14 +42,14 @@ def timerFired(app):
     # app.player.refreshPlayerVision(app)
     pass
      
-def getCell(app, x, y):
+def getCell(app, x, y): #https://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
     # aka "viewToModel"
     # return (row, col) in which (x, y) occurred or (-1, -1) if outside grid.
     row = int((y) / app.cellWidth)
     col = int((x) / app.cellWidth)
     return (row, col)
 
-def getCellBounds(app, row, col):
+def getCellBounds(app, row, col): #same as above
     # aka "modelToView"
     # returns (x0, y0, x1, y1) corners/bounding box of given cell in grid
     x0 = col * app.cellWidth

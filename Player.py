@@ -32,19 +32,11 @@ class Player(object):
         return True 
     
     def move(self,app,dx):
-        # oldCol = int((self.x) / app.cellWidth)        
-        # self.x += dx
-        
-        # newCol = int((self.x) / app.cellWidth)
-        # self.col = newCol
         if self.col+len(app.world.map[100]) <= len(app.world.map[0])+20 :
-            for i in range(100):
-                app.world.expandMapLeft()
-            self.col += 100
+            app.world.expandMapLeft(app)
+            self.col += 1000
         if self.col-len(app.world.map[100]) >= -20:
-            for i in range(100):
-                app.world.expandMapRight()
-            self.col -= 100
+            app.world.expandMapRight(app)
         self.col += dx
         self.refreshPlayerVision(app)
                 
@@ -53,11 +45,11 @@ class Player(object):
         self.refreshPlayerVision(app)
     
     def mine(self,app,x,y):
-        print("Mining away")
+        # print("Mining away")
         locRow = (self.row+x-self.visRows//2)
         locCol = (self.col+y-self.visCols//2)
-        print(f"row:{locRow} | col:{locCol}")
-        print(app.world.map[locRow][locCol].tough)
+        # print(f"row:{locRow} | col:{locCol}")
+        # print(app.world.map[locRow][locCol].tough)
         if app.world.map[locRow][locCol].mineable:
             app.world.map[locRow][locCol].tough -= 1
         if app.world.map[locRow][locCol].tough <= 0:

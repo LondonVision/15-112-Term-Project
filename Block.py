@@ -11,3 +11,6 @@ class Block(object):
         if isinstance(other,Block) and self.name == other.name:
             return True
         return False
+    
+    def __repr__(self):
+        return f"Name: {self.name}"
