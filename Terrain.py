@@ -35,16 +35,13 @@ class Terrain(object):
         
         
     def expandMapLeft(self):
-        print("expanding map")
+        print("expanding left")
         for i in range(self.rows):
             randNum = random.randint(0,10)
             if i == 0:
-                self.map[0].insert(0,Block("sky",0,"SkyBlue1",False))
+                self.map[0].insert(0,Block("sky",0,"SkyBlue1",False,False))
             if i == self.rows-1:
                 self.map[0].insert(0,Block("bedrock",1000,"gray4",True,False))
-            # else:
-                # self.map[i].insert(0,self.map[i][0])
-                # print(f"rows: {len(self.map)}\ncols: {len(self.map[0])}")
             if randNum<=4:#stay even
                 self.map[i].insert(0,self.map[i][0])
             elif randNum<=7:#increase terrain
@@ -52,12 +49,29 @@ class Terrain(object):
                 self.map[i-1][0] = self.map[i][0]
             else: #decrease terrain
                 self.map[i].insert(0,self.map[i-1][0])
+            #conditionals to make sure dirt is preserved and heights stay decent
             if i>75 and i<77 and self.map[i][0].solid:
                 self.map[i][0] = Block("dirt",10,"tan4")
-            if i <75 and self.map[i][0].solid:
-                self.map[i][0] = Block("sky",0,"SkyBlue1",False)
-                
-            
-            # else:
-            #     x+=1
-            #     self.map[i].insert(0,0)
+            if i<75 and self.map[i][0].solid:
+                self.map[i][0] = Block("sky",0,"SkyBlue1",False,False)
+    
+    def expandMapRight(self):
+        print("expanding right")
+        for i in range(self.rows):
+            randNum = random.randint(0,10)
+            if i == 0:
+                self.map[0].append(Block("sky",0,"SkyBlue1",False,False))
+            if i == self.rows-1:
+                self.map[0].append(Block("bedrock",1000,"gray4",True,False))
+            if randNum<=4:#stay even
+                self.map[i].append(self.map[i][-1])
+            elif randNum<=8:#increase terrain
+                self.map[i].append(self.map[i][-1])
+                self.map[i-1][-1] = self.map[i][-1]
+            else: #decrease terrain
+                self.map[i].append(self.map[i-1][-1])
+            #conditionals to make sure dirt is preserved and heights stay decent
+            if i>75 and i<77 and self.map[i][-1].solid:
+                self.map[i][-1] = Block("dirt",10,"tan4")
+            if i<75 and self.map[i][-1].solid:
+                self.map[i][-1] = Block("sky",0,"SkyBlue1",False,False)

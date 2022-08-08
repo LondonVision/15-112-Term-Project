@@ -1,4 +1,5 @@
 import time
+from Block import*
 class Player(object):
     def __init__(self,app):
         self.health = 20
@@ -36,13 +37,33 @@ class Player(object):
         
         # newCol = int((self.x) / app.cellWidth)
         # self.col = newCol
-        if self.col+len(app.world.map[0]) <= len(app.world.map[0])+20 :
+        if self.col+len(app.world.map[100]) <= len(app.world.map[0])+20 :
             for i in range(100):
                 app.world.expandMapLeft()
             self.col += 100
+        if self.col-len(app.world.map[100]) >= -20:
+            for i in range(100):
+                app.world.expandMapRight()
+            self.col -= 100
         self.col += dx
         self.refreshPlayerVision(app)
                 
     def jump(self,app):
         self.row -= 2
         self.refreshPlayerVision(app)
+    
+    def mine(self,app,x,y):
+        print("Mining away")
+        locRow = (self.row+x-self.visRows//2)
+        locCol = (self.col+y-self.visCols//2)
+        print(f"row:{locRow} | col:{locCol}")
+        print(app.world.map[locRow][locCol].tough)
+        if app.world.map[locRow][locCol].mineable:
+            app.world.map[locRow][locCol].tough -= 1
+        if app.world.map[locRow][locCol].tough <= 0:
+            for row in range(len(self.inventory)):
+                for col in range(len(self.inventory[0])):
+                    if self.inventory[row][col] == None:
+                        self.inventory[row][col] = app.world.map[locRow][locCol]
+            app.world.map[locRow][locCol] = Block("background",0,"gray65",False,False)
+        self.refreshPlayerVision(app)            

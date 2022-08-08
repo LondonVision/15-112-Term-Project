@@ -32,7 +32,13 @@ def keyPressed(app, event):
     if (event.key == "Down"): #TODO this is temperary - gravity will do this
         app.player.row += 1
         app.player.refreshPlayerVision(app)
-        
+
+def mousePressed(app,event):
+    row,col = getCell(app,event.x,event.y)
+    if (row>app.player.visRows//4 and row<app.player.visRows*3//4 and
+        col>app.player.visRows//4 and col<app.player.visCols*3//4):
+        app.player.mine(app,row,col)
+
 def timerFired(app):
     # app.player.refreshPlayerVision(app)
     pass
