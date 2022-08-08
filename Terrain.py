@@ -71,4 +71,3 @@ class Terrain(object):
         chunk = self.createChunk(1000,app.layers)
         for i in range(self.rows):
             self.map[i].extend(chunk[i])
-    

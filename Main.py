@@ -21,8 +21,8 @@ def appStarted(app):
     app.invOpen = False
     
     app.cellWidth = app.width / app.player.visCols
+    app.timerDelay = 98
                         
-    
 def keyPressed(app, event):
     if (event.key == "a"):
         app.player.move(app,-1)
@@ -30,13 +30,9 @@ def keyPressed(app, event):
         app.player.move(app,+1)
     if (event.key == "Space"):
         app.player.jump(app)
-    if (event.key == "Down"): #TODO this is temperary - gravity will do this
-        app.player.row += 1
-        app.player.refreshPlayerVision(app)
     if (event.key == "e"):
         app.invOpen = not app.invOpen
     
-
 def mousePressed(app,event):
     row,col = getCell(app,event.x,event.y)
     if (row>app.player.visRows//4 and row<app.player.visRows*3//4 and
@@ -44,8 +40,10 @@ def mousePressed(app,event):
         app.player.mine(app,row,col)
 
 def timerFired(app):
-    # app.player.refreshPlayerVision(app)
-    pass
+    if not app.world.map[app.player.row+1][app.player.col].solid:
+        app.player.row+=1
+        app.player.refreshPlayerVision(app)
+    
      
 def getCell(app, x, y): #https://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
     # aka "viewToModel"

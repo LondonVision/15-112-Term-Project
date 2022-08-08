@@ -25,7 +25,7 @@ class Player(object):
                 self.visable[visRow][visCol] = (app.world.map[(posRow-self.visRows//2)]
                                                 [(posCol-self.visCols//2)])
         # print(f"time taken = {(time.time()-start)*1000//1}")
-    
+            
     def isPositionLegal(self,app):
         if app.world.map[self.row][self.col].solid:
             return False
@@ -44,7 +44,10 @@ class Player(object):
         self.refreshPlayerVision(app)
                 
     def jump(self,app):
-        self.row -= 2
+        if app.world.map[self.row+1][self.col].solid:
+            self.row -= 2
+        if not self.isPositionLegal(app):
+            self.row += 2
         self.refreshPlayerVision(app)
     
     def mine(self,app,x,y):
