@@ -4,6 +4,7 @@ class Player(object):
     def __init__(self,app):
         self.health = 20
         self.inventory = [([(None,0)]*10) for row in range(4)]
+        self.hotbarSlot = 0
         self.x = app.width/2
         self.y = app.height/2
         
@@ -128,6 +129,16 @@ class Player(object):
             canvas.create_rectangle(x0,y0,x1,y1,fill="LightBlue3")
             canvas.create_rectangle(x0+4,y0+4,x1-4,y1-4,fill=color,outline=color)
             canvas.create_text((x0+x1)/2,(y0+y1)/2,text=amount)
+            
+    def drawHotbarSelected(self,app,canvas):
+        x0 = self.hotbarSlot*(app.width/12.5) + app.width/10
+        x1 = (self.hotbarSlot+1)*(app.width/12.5) + app.width/10
+        y0 = app.height*16.5/20
+        y1 = app.height*18.1/20
+        canvas.create_line(x0,y0,x1,y0,fill="snow",width="3")
+        canvas.create_line(x0,y1,x1,y1,fill="snow",width="3")
+        canvas.create_line(x0,y0,x0,y1,fill="snow",width="3")
+        canvas.create_line(x1,y1,x1,y0,fill="snow",width="3")
     
     def getCellBounds(self,app, row, col,width): #same link as above
         # aka "modelToView"
@@ -143,5 +154,6 @@ class Player(object):
         self.drawPlayer(app,canvas)
         self.drawCoords(app,canvas)
         self.drawHotbar(app,canvas)
+        self.drawHotbarSelected(app,canvas)
         if app.invOpen:
             self.drawInventory(app,canvas)

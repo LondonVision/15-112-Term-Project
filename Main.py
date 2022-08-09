@@ -15,7 +15,7 @@ def appStarted(app):
               (180,Block("bedrock",1000,"gray4",True,False))]
     app.world = Terrain(app,app.rows,app.cols)
     app.world.createMap(app.layers)
-    
+    print("Game Launching...")
     app.player = Player(app)
     app.player.refreshPlayerVision(app)
     app.invOpen = False
@@ -37,9 +37,12 @@ def keyPressed(app, event):
         app.player.jump(app)
     if (event.key == "e"):
         app.invOpen = not app.invOpen
+    if (event.key in set(["1","2","3","4","5","6","7","8","9","0"])):
+        app.player.hotbarSlot = int(event.key)
     
 def mousePressed(app,event):
     row,col = getCell(app,event.x,event.y)
+    #player can only mine in a 5x5 grid around themselves
     if (row>app.player.visRows//4 and row<app.player.visRows*3//4 and
         col>app.player.visRows//4 and col<app.player.visCols*3//4):
         app.player.mine(app,row,col)

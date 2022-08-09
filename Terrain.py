@@ -8,6 +8,7 @@ class Terrain(object):
     
     def createLevel(self,heighest,block,L,size):
         x = 1000000
+        print(f"Creating {block.name} layer")
         for i in range(heighest,self.rows):
             for j in range(size):
                 randNum = random.randint(0,1000000)
@@ -27,21 +28,21 @@ class Terrain(object):
                     L[i][j] = copy.copy(block)
                 x -= 1
         
-    def createMap(self,L):#list of tuples of information
+    def createMap(self,L):#L = list of tuples of information
         for layer,block in L:
             self.createLevel(layer,block,self.map,self.cols)
-        self.caveGen(self.map, 15)
+        self.caveGen(self.map, 15) #increasing this number increases the "smoothness" of caves
             
-    def caveGen(self,L,passes):
+    def caveGen(self,L,passes): #example 7 - https://www.cs.cmu.edu/~112/notes/student-tp-guides/Terrain.pdf
         for row in range(80,len(L)-1): #80 because highest dirt is 75 and some top layer should be preserved
             for col in range(len(L[0])):
                 if L[row][col].solid and random.randint(0,100)<=37: #hole randomness
                     L[row][col] = Block("background",1,"gray65",False,False)
-        print("holes")
-        
+        print("Generating Caves...")
+        #I used a set for its attribute of being unordered and cause its fast
         possible = set([(1,0),(1,1),(1,-1),(0,-1),(0,1),(-1,0),(-1,-1),(-1,1)])          
         for i in range(passes):
-            print(f"pass number: {i}")
+            print(f"Smoothing Caves: {i}")
             for row in range(80,len(L)-1):
                 for col in range(1,len(L[0])-1):
                     air = 0
@@ -57,7 +58,7 @@ class Terrain(object):
                                 not L[row][col].name == "sky"):
                                 L[row][col] = copy.deepcopy(L[row+drow][col+dcol])
                                 break
-        print("Cave Gen")
+        print("Cave Gen complete")
                             
     
     def createChunk(self,size,L):
