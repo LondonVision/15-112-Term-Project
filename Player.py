@@ -3,7 +3,7 @@ from Block import*
 class Player(object):
     def __init__(self,app):
         self.health = 20
-        self.inventory = [([(None,0)]*9) for row in range(4)]
+        self.inventory = [([(None,0)]*10) for row in range(4)]
         self.x = app.width/2
         self.y = app.height/2
         self.col = app.cols//2
@@ -20,10 +20,10 @@ class Player(object):
         # start = time.time()
         for visRow in range (self.visRows):
             for visCol in range (self.visCols):
-                posRow = self.row + visRow
-                posCol = self.col + visCol
-                self.visable[visRow][visCol] = (app.world.map[(posRow-self.visRows//2)]
-                                                [(posCol-self.visCols//2)])
+                posRow = self.row + visRow - self.visRows//2
+                posCol = self.col + visCol - self.visCols//2
+                # print(f"1: {(posRow-self.visRows//2)}\n2: {(posCol-self.visCols//2)}")   
+                self.visable[visRow][visCol] = app.world.map[posRow][posCol]
         # print(f"time taken = {(time.time()-start)*1000//1}")
             
     def isPositionLegal(self,app):
