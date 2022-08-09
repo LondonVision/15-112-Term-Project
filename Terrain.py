@@ -30,25 +30,33 @@ class Terrain(object):
     def createMap(self,L):#list of tuples of information
         for layer,block in L:
             self.createLevel(layer,block,self.map,self.cols)
-        # self.caveGen(self.map, 3)
+        self.caveGen(self.map, 15)
             
     def caveGen(self,L,passes):
-        for row in range(len(L)):
+        for row in range(80,len(L)-1): #80 because highest dirt is 75 and some top layer should be preserved
             for col in range(len(L[0])):
-                if L[row][col].solid and random.randint(0,5)==5:
+                if L[row][col].solid and random.randint(0,100)<=37: #hole randomness
                     L[row][col] = Block("background",1,"gray65",False,False)
         print("holes")
         
-        possible = [(-1,0),(0,-1),(1,0),(0,1),(-1,-1),(-1,1),(1,1),(1,-1)]            
+        possible = set([(1,0),(1,1),(1,-1),(0,-1),(0,1),(-1,0),(-1,-1),(-1,1)])          
         for i in range(passes):
-            for row in range(1,len(L)-1):
+            print(f"pass number: {i}")
+            for row in range(80,len(L)-1):
                 for col in range(1,len(L[0])-1):
-                    count = 0
-                    for dx,dy in possible:
-                        if not L[row+dy][col+dx].solid:
-                            count+=1
-                    if count >= 6:
+                    air = 0
+                    for drow,dcol in possible:
+                        if (not L[row+drow][col+dcol].solid and 
+                            not L[row+drow][col+dcol].name == "sky"):
+                            air+=1
+                    if air >= 5: #if there are x air blocks around this block, it is air
                         L[row][col] = Block("background",1,"gray65",False,False)
+                    if air <= 2: #if there are less than x air blocks around this block, it is solid
+                        for drow,dcol in possible:
+                            if (L[row+drow][col+dcol].solid and 
+                                not L[row][col].name == "sky"):
+                                L[row][col] = copy.deepcopy(L[row+drow][col+dcol])
+                                break
         print("Cave Gen")
                             
     

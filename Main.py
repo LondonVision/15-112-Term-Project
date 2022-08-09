@@ -22,8 +22,7 @@ def appStarted(app):
     
     app.cellWidth = app.width / app.player.visCols
     app.timerDelay = 98
-            
-            
+                  
 def timerFired(app):
     if not app.world.map[app.player.row+1][app.player.col].solid:
         app.player.row+=1
@@ -44,10 +43,7 @@ def mousePressed(app,event):
     if (row>app.player.visRows//4 and row<app.player.visRows*3//4 and
         col>app.player.visRows//4 and col<app.player.visCols*3//4):
         app.player.mine(app,row,col)
-
-
-    
-     
+   
 def getCell(app, x, y): #https://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
     # aka "viewToModel"
     # return (row, col) in which (x, y) occurred or (-1, -1) if outside grid.
@@ -62,64 +58,9 @@ def getCellBounds(app, row, col,width): #same link as above
     x1 = (col+1) * width
     y0 = row * width
     y1 = (row+1) * width
-    return (x0, y0, x1, y1)
-
-def drawVisable(app,canvas):
-    for row in range(len(app.player.visable)):
-        for col in range(len(app.player.visable[0])):
-            color = app.player.visable[row][col].color
-            x0,y0,x1,y1 = getCellBounds(app,row,col,app.cellWidth)
-            canvas.create_rectangle(x0,y0,x1,y1,fill=color)
-
-def drawPlayer(app,canvas):
-    # w = app.cellWidth/2
-    # canvas.create_rectangle(app.player.x-w,app.player.y-w,
-                            # app.player.x+w,app.player.y+w,fill="red")
-    x0,y0,x1,y1 = getCellBounds(app,20,20,app.cellWidth)
-    canvas.create_rectangle(x0,y0,x1,y1,fill="red")
-    
-def drawCoords(app,canvas):
-    canvas.create_text(app.width/2,0,
-                       text=f"x: {app.player.col}\ny: {app.player.row}",
-                       anchor="n")
-
-def drawInventory(app,canvas):
-    for row in range(len(app.player.inventory)):
-        for col in range(len(app.player.inventory[0])):
-            (block,amount) = app.player.inventory[row][col]
-            color = "LightBlue3"
-            if not block == None:
-                color = block.color
-            if amount == 0:
-                amount = ""
-            x0,y0,x1,y1 = getCellBounds(app,row,col,app.cellWidth*2)
-            canvas.create_rectangle(x0,y0,x1,y1,fill="LightBlue3")
-            canvas.create_rectangle(x0+4,y0+4,x1-4,y1-4,fill=color,outline=color)
-            canvas.create_text((x0+x1)/2,(y0+y1)/2,text=amount)
-            
-def drawHotbar(app,canvas):
-    for col in range(len(app.player.inventory[0])):
-        block,amount = app.player.inventory[0][col]
-        color = "LightBlue3"
-        if not block == None:
-            color = block.color
-        if amount == 0:
-            amount = ""
-        x0 = col*(app.width/12.5) + app.width/10
-        x1 = (col+1)*(app.width/12.5) + app.width/10
-        y0 = app.height*16.5/20
-        y1 = app.height*18.1/20
-        canvas.create_rectangle(x0,y0,x1,y1,fill="LightBlue3")
-        canvas.create_rectangle(x0+4,y0+4,x1-4,y1-4,fill=color,outline=color)
-        canvas.create_text((x0+x1)/2,(y0+y1)/2,text=amount)
-        
+    return (x0, y0, x1, y1)      
             
 def redrawAll(app,canvas):
-    drawVisable(app,canvas)
-    drawPlayer(app,canvas)
-    drawCoords(app,canvas)
-    drawHotbar(app,canvas)
-    if app.invOpen:
-        drawInventory(app,canvas)
+    app.player.redraw(app,canvas)
 
 runApp(width=600, height=600)
