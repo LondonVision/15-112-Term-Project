@@ -1,4 +1,4 @@
-import time
+import time,copy
 from Block import*
 class Player(object):
     def __init__(self,app):
@@ -54,32 +54,53 @@ class Player(object):
             self.row += 2
         self.refreshPlayerVision(app)
     
+    def addBlockToInventory(self,item):
+        breakFlag = False
+        for row in range(len(self.inventory)):
+            for col in range(len(self.inventory[0])):
+                if item in self.inventory[row][col]:
+                    block,amount = self.inventory[row][col]
+                    self.inventory[row][col] = (block,amount+1)
+                    breakFlag = True
+                    break
+                elif self.inventory[row][col] == (None,0):
+                    self.inventory[row][col] = (item,1)
+                    breakFlag = True
+                    break
+            if breakFlag:
+                break
     def mine(self,app,x,y):
         # print("Mining away")
         locRow = (self.row+x-self.visRows//2)
         locCol = (self.col+y-self.visCols//2)
-        breakFlag = False
         # print(f"row:{locRow} | col:{locCol}")
         # print(app.world.map[locRow][locCol].tough)
         if app.world.map[locRow][locCol].mineable:
             app.world.map[locRow][locCol].tough -= 1
         if app.world.map[locRow][locCol].tough <= 0:
-            for row in range(len(self.inventory)):
-                for col in range(len(self.inventory[0])):
-                    if app.world.map[locRow][locCol] in self.inventory[row][col]:
-                        block,amount = self.inventory[row][col]
-                        self.inventory[row][col] = (block,amount+1)
-                        breakFlag = True
-                        break
-                    elif self.inventory[row][col] == (None,0):
-                        self.inventory[row][col] = (app.world.map[locRow][locCol],1)
-                        breakFlag = True
-                        break
-                if breakFlag:
-                    break
+            temp = app.world.map[locRow][locCol]
+            temp.tough = app.blockToughDict.get(temp.name)
+            self.addBlockToInventory(copy.deepcopy(temp))
             app.world.map[locRow][locCol] = Block("background",1,"gray65",False,False)
         self.refreshPlayerVision(app)
     
+    def placeBlock(self,app,row,col):
+        locRow = (self.row+row-self.visRows//2)
+        locCol = (self.col+col-self.visCols//2)
+        if not isinstance(self.inventory[0][self.hotbarSlot],tuple): #if its not a block,don't place it
+            return
+        elif self.inventory[0][self.hotbarSlot] == (None,0): #if the slot is empty, don't do anything
+            return
+        elif app.world.map[locRow][locCol].solid: #if the location is not valid, don't place it
+            return
+        block,amount = self.inventory[0][self.hotbarSlot]
+        app.world.map[locRow][locCol] = copy.deepcopy(block)
+        amount-=1
+        if amount <= 0:
+            self.inventory[0][self.hotbarSlot] = (None,0)
+        else:
+            self.inventory[0][self.hotbarSlot] = (block,amount)
+        self.refreshPlayerVision(app)
 
     def drawVisable(self,app,canvas):
         for row in range(len(self.visable)):

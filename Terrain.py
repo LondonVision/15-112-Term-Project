@@ -31,7 +31,7 @@ class Terrain(object):
     def createMap(self,L):#L = list of tuples of information
         for layer,block in L:
             self.createLevel(layer,block,self.map,self.cols)
-        self.caveGen(self.map, 15) #increasing this number increases the "smoothness" of caves
+        self.caveGen(self.map, 10) #increasing this number increases the "smoothness" of caves
             
     def caveGen(self,L,passes): #example 7 - https://www.cs.cmu.edu/~112/notes/student-tp-guides/Terrain.pdf
         for row in range(80,len(L)-1): #80 because highest dirt is 75 and some top layer should be preserved

@@ -13,6 +13,7 @@ def appStarted(app):
               (85,Block("stone",10,"light slate gray")),
               (125,Block("deep stone",20,"gray20")),
               (180,Block("bedrock",1000,"gray4",True,False))]
+    app.blockToughDict = {"dirt":5,"stone":10,"deep stone":20}
     app.world = Terrain(app,app.rows,app.cols)
     app.world.createMap(app.layers)
     print("Game Launching...")
@@ -38,14 +39,21 @@ def keyPressed(app, event):
     if (event.key == "e"):
         app.invOpen = not app.invOpen
     if (event.key in set(["1","2","3","4","5","6","7","8","9","0"])):
-        app.player.hotbarSlot = int(event.key)
+        if event.key == "0":
+            app.player.hotbarSlot = 9
+        else:
+            app.player.hotbarSlot = int(event.key)-1
     
 def mousePressed(app,event):
     row,col = getCell(app,event.x,event.y)
     #player can only mine in a 5x5 grid around themselves
     if (row>app.player.visRows//4 and row<app.player.visRows*3//4 and
         col>app.player.visRows//4 and col<app.player.visCols*3//4):
-        app.player.mine(app,row,col)
+        if (not isinstance(app.player.inventory[0][app.player.hotbarSlot],tuple) or
+            app.player.inventory[0][app.player.hotbarSlot] == (None,0)):
+            app.player.mine(app,row,col)
+        else:
+            app.player.placeBlock(app,row,col)
    
 def getCell(app, x, y): #https://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
     # aka "viewToModel"
