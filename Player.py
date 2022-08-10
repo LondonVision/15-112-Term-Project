@@ -8,6 +8,7 @@ class Player(object):
         self.selected = None
         
         self.craftingGrid = [([None]*2) for i in range(2)]
+        self.output = None
         
         self.visCols = 40
         self.visRows = 40
@@ -176,6 +177,37 @@ class Player(object):
                                 fill=block.color)
         canvas.create_text(app.mouseX,app.mouseY,text=amount)
     
+    def drawCraftingGrid(self,app,canvas):
+        for row in range(len(self.craftingGrid)):
+            for col in range(len(self.craftingGrid[0])):
+                block,amount = None,0
+                if isinstance(self.craftingGrid[row][col],tuple):
+                    block,amount = self.craftingGrid[row][col]
+                color = "LightBlue3"
+                if not block == None:
+                    color = block.color
+                if amount == 0:
+                    amount = ""
+                x0,y0,x1,y1 = self.getCellBounds(app,row+1,col+11,app.cellWidth*2)
+                canvas.create_rectangle(x0,y0,x1,y1,fill="LightBlue3")
+                canvas.create_rectangle(x0+4,y0+4,x1-4,y1-4,fill=color,outline=color)
+                canvas.create_text((x0+x1)/2,(y0+y1)/2,text=amount)
+                
+    def drawOutput(self,app,canvas):
+        block,amount = None,0
+        if isinstance(self.output,tuple):
+            block,amount = self.output
+        color = "LightBlue3"
+        if not block == None:
+            color = block.color
+        if amount == 0:
+            amount = ""
+        x0,y0,x1,y1 = self.getCellBounds(app,1,14,app.cellWidth*2)
+        canvas.create_rectangle(x0,y0,x1,y1,fill="LightBlue3")
+        canvas.create_rectangle(x0+4,y0+4,x1-4,y1-4,fill=color,outline=color)
+        canvas.create_text((x0+x1)/2,(y0+y1)/2,text=amount)
+        
+        
     def getCellBounds(self,app, row, col,width): #same link as above
         # aka "modelToView"
         # returns (x0, y0, x1, y1) corners/bounding box of given cell in grid
@@ -193,5 +225,7 @@ class Player(object):
         self.drawHotbarSelected(app,canvas)
         if app.invOpen:
             self.drawInventory(app,canvas)
+            self.drawCraftingGrid(app, canvas)
+            self.drawOutput(app, canvas)
             if not self.selected == None:
                 self.drawSelected(app, canvas)

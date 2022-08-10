@@ -2,6 +2,7 @@ from cmu_112_graphics import *
 from Player import *
 from Terrain import *
 from Block import *
+from Craft import *
 import random,sys
 
 def appStarted(app):
@@ -24,6 +25,8 @@ def appStarted(app):
     app.cellWidth = app.width / app.player.visCols
     app.timerDelay = 98
     
+    app.craft = Craft()
+    
     app.mouseX = 0
     app.mouseY = 0
                   
@@ -31,6 +34,8 @@ def timerFired(app):
     if not app.world.map[app.player.row+1][app.player.col].solid:
         app.player.row+=1
         app.player.refreshPlayerVision(app)
+    if app.invOpen:
+        checkCraftingGrid(app)
                                 
 def keyPressed(app, event):
     if (event.key == "a"):
@@ -55,19 +60,28 @@ def mousePressed(app,event):
     row,col = getCell(app,event.x,event.y)
     miniRow,miniCol = int((event.y) / app.cellWidth/2),int((event.x) / app.cellWidth/2)
     #player can only mine in a 5x5 grid around themselves
+    #moving items in inventory
     if (app.invOpen and miniRow >= 0 and miniRow < len(app.player.inventory) and
         miniCol >=0 and miniCol < len(app.player.inventory[0])):
-        if app.player.selected == None:
-            print("trying")
-            app.player.selected = app.player.inventory[miniRow][miniCol]
-            app.player.inventory[miniRow][miniCol] = None
-        elif (not app.player.selected == None and 
-            app.player.inventory[miniRow][miniCol] == None):
-            app.player.inventory[miniRow][miniCol] = app.player.selected
-            app.player.selected = None
-        print(f"row: {miniRow} col: {miniCol}")
-        print(app.player.selected)
-    
+        moveItem(app,app.player.inventory,miniRow,miniCol)
+    #moving items around crafting grid
+    if (app.invOpen and miniRow >= 1 and miniRow <= 2 and miniCol >= 11 and miniCol <=13):
+        moveItem(app,app.player.craftingGrid,miniRow-1,miniCol-11)  
+        checkCraftingGrid(app)
+    if (app.invOpen and miniRow == 1 and miniCol == 14 and 
+        not app.player.output == None):
+        app.player.selected = app.player.output
+        app.player.output = None
+        for row in range (len(app.player.craftingGrid)):
+            for col in range(len(app.player.craftingGrid[0])):
+                if not app.player.craftingGrid[row][col]==None:
+                    block,amount = app.player.craftingGrid[row][col]
+                    amount -= 1
+                    if amount <= 0:
+                        app.player.craftingGrid[row][col] = None
+                    else:
+                        app.player.craftingGrid[row][col] = (block,amount)
+    #mining and building
     if (row>app.player.visRows//4 and row<app.player.visRows*3//4 and
         col>app.player.visRows//4 and col<app.player.visCols*3//4):
         if (not isinstance(app.player.inventory[0][app.player.hotbarSlot],tuple) or
@@ -75,7 +89,34 @@ def mousePressed(app,event):
             app.player.mine(app,row,col)
         else:
             app.player.placeBlock(app,row,col)
-   
+
+def moveItem(app,L,row,col):
+    if app.player.selected == None:
+        app.player.selected = L[row][col]
+        L[row][col] = None
+    elif (not app.player.selected == None and 
+        L[row][col] == None):
+        L[row][col] = app.player.selected
+        app.player.selected = None
+    elif (not app.player.selected == None and not L[row][col] == None
+          and app.player.selected[0]==L[row][col][0]):
+        L[row][col] = (app.player.selected[0],
+                                             app.player.selected[1]+L[row][col][1])
+        app.player.selected = None
+
+#I used this for the idea to turn the grid into a string
+#https://gamedev.stackexchange.com/questions/21586/how-could-i-implement-something-like-minecrafts-crafting-grid#:~:text=The%20crafting%20system%20in%20Minecraft,exchange%20certain%20ingredients%20for%20others.
+def checkCraftingGrid(app):
+    result = ""
+    for row in range(len(app.player.craftingGrid)):
+        for col in range(len(app.player.craftingGrid[0])):
+            if app.player.craftingGrid[row][col]==None:
+                result += "None"
+            else:
+                result += app.player.craftingGrid[row][col][0].name
+    if result in app.craft.recipes:
+        app.player.output = app.craft.recipes[result]
+
 def getCell(app, x, y): #https://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
     # aka "viewToModel"
     # return (row, col) in which (x, y) occurred or (-1, -1) if outside grid.
