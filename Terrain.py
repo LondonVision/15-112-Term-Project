@@ -42,7 +42,7 @@ class Terrain(object):
         #I used a set for its attribute of being unordered and cause its fast
         possible = set([(1,0),(1,1),(1,-1),(0,-1),(0,1),(-1,0),(-1,-1),(-1,1)])          
         for i in range(passes):
-            print(f"Smoothing Caves: {i}")
+            print(f"Smoothing Caves: {(i+1)*10}%")
             for row in range(80,len(L)-1):
                 for col in range(1,len(L[0])-1):
                     air = 0

@@ -16,7 +16,6 @@ class Player(object):
         while not app.world.map[self.row+1][self.col].solid:
             self.row += 1
     
-        
         self.visable = [([0]*self.visCols) for row in range(self.visRows)]
         
     def refreshPlayerVision(self,app):
@@ -45,6 +44,8 @@ class Player(object):
         self.col += dx
         if not self.isPositionLegal(app):
             self.col -= dx
+        if not app.world.map[self.row+1][self.col].solid:
+            self.row += 1
         self.refreshPlayerVision(app)
                 
     def jump(self,app):
