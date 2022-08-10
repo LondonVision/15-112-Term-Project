@@ -3,8 +3,9 @@ from Block import*
 class Player(object):
     def __init__(self,app):
         self.health = 20
-        self.inventory = [([(None,0)]*10) for row in range(4)]
+        self.inventory = [([None]*10) for row in range(4)]
         self.hotbarSlot = 0
+        self.selected = None
         
         self.craftingGrid = [([None]*2) for i in range(2)]
         
@@ -59,12 +60,12 @@ class Player(object):
         breakFlag = False
         for row in range(len(self.inventory)):
             for col in range(len(self.inventory[0])):
-                if item in self.inventory[row][col]:
+                if isinstance(self.inventory[row][col],tuple) and item in self.inventory[row][col]:
                     block,amount = self.inventory[row][col]
                     self.inventory[row][col] = (block,amount+1)
                     breakFlag = True
                     break
-                elif self.inventory[row][col] == (None,0):
+                elif self.inventory[row][col] == None:
                     self.inventory[row][col] = (item,1)
                     breakFlag = True
                     break
@@ -91,7 +92,7 @@ class Player(object):
         locCol = (self.col+col-self.visCols//2)
         if not isinstance(self.inventory[0][self.hotbarSlot],tuple): #if its not a block,don't place it
             return
-        elif self.inventory[0][self.hotbarSlot] == (None,0): #if the slot is empty, don't do anything
+        elif self.inventory[0][self.hotbarSlot] == None: #if the slot is empty, don't do anything
             return
         elif app.world.map[locRow][locCol].solid: #if the location is not valid, don't place it
             return
@@ -99,7 +100,7 @@ class Player(object):
         app.world.map[locRow][locCol] = copy.deepcopy(block)
         amount-=1
         if amount <= 0:
-            self.inventory[0][self.hotbarSlot] = (None,0)
+            self.inventory[0][self.hotbarSlot] = None
         else:
             self.inventory[0][self.hotbarSlot] = (block,amount)
         self.refreshPlayerVision(app)
@@ -126,7 +127,9 @@ class Player(object):
     def drawInventory(self,app,canvas):
         for row in range(len(self.inventory)):
             for col in range(len(self.inventory[0])):
-                (block,amount) = self.inventory[row][col]
+                block,amount = None,0
+                if isinstance(self.inventory[row][col],tuple):
+                    block,amount = self.inventory[row][col]
                 color = "LightBlue3"
                 if not block == None:
                     color = block.color
@@ -139,7 +142,9 @@ class Player(object):
                 
     def drawHotbar(self,app,canvas):
         for col in range(len(self.inventory[0])):
-            block,amount = self.inventory[0][col]
+            block,amount = None,0
+            if isinstance(self.inventory[0][col],tuple):
+                block,amount = self.inventory[0][col]
             color = "LightBlue3"
             if not block == None:
                 color = block.color
@@ -163,6 +168,14 @@ class Player(object):
         canvas.create_line(x0,y0,x0,y1,fill="snow",width="3")
         canvas.create_line(x1,y1,x1,y0,fill="snow",width="3")
     
+    def drawSelected(self,app,canvas):
+        if isinstance(self.selected,tuple):
+                block,amount = self.selected
+        canvas.create_rectangle(app.mouseX-app.cellWidth+4, app.mouseY-app.cellWidth+4,
+                                app.mouseX+app.cellWidth-4, app.mouseY+app.cellWidth-4,
+                                fill=block.color)
+        canvas.create_text(app.mouseX,app.mouseY,text=amount)
+    
     def getCellBounds(self,app, row, col,width): #same link as above
         # aka "modelToView"
         # returns (x0, y0, x1, y1) corners/bounding box of given cell in grid
@@ -180,3 +193,5 @@ class Player(object):
         self.drawHotbarSelected(app,canvas)
         if app.invOpen:
             self.drawInventory(app,canvas)
+            if not self.selected == None:
+                self.drawSelected(app, canvas)
