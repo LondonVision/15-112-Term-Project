@@ -5,8 +5,8 @@ class Player(object):
         self.health = 20
         self.inventory = [([(None,0)]*10) for row in range(4)]
         self.hotbarSlot = 0
-        self.x = app.width/2
-        self.y = app.height/2
+        
+        self.craftingGrid = [([None]*2) for i in range(2)]
         
         self.visCols = 40
         self.visRows = 40
@@ -69,6 +69,7 @@ class Player(object):
                     break
             if breakFlag:
                 break
+            
     def mine(self,app,x,y):
         # print("Mining away")
         locRow = (self.row+x-self.visRows//2)
@@ -78,7 +79,7 @@ class Player(object):
         if app.world.map[locRow][locCol].mineable:
             app.world.map[locRow][locCol].tough -= 1
         if app.world.map[locRow][locCol].tough <= 0:
-            temp = app.world.map[locRow][locCol]
+            temp = app.world.map[locRow][locCol].drops
             temp.tough = app.blockToughDict.get(temp.name)
             self.addBlockToInventory(copy.deepcopy(temp))
             app.world.map[locRow][locCol] = Block("background",1,"gray65",False,False)

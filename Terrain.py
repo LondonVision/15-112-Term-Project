@@ -65,10 +65,11 @@ class Terrain(object):
         chunk = [([Block("sky",0,"SkyBlue1",False,False)]*size) for row in range(self.rows)]
         for layer,block in L:
             self.createLevel(layer, block, chunk, size)
+        self.caveGen(chunk, 10)
         return chunk
         
     def expandMapLeft(self,app):
-        chunk = self.createChunk(1000,app.layers)
+        chunk = self.createChunk(100,app.layers)
         for i in range(self.rows):
             self.insertRow(chunk[i],self.map[i])
             
@@ -80,6 +81,6 @@ class Terrain(object):
             return self.insertRow(L1[:-1],L2)
         
     def expandMapRight(self,app):
-        chunk = self.createChunk(1000,app.layers)
+        chunk = self.createChunk(100,app.layers)
         for i in range(self.rows):
             self.map[i].extend(chunk[i])
