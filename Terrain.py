@@ -5,10 +5,12 @@ class Terrain(object):
         self.rows = rows
         self.cols = cols
         self.map = [([Block("sky",1,"SkyBlue1",False,False)]*self.cols) for row in range(self.rows)]
-    
+        self.text = ""
+        
     def createLevel(self,heighest,block,L,size):
         x = 1000000
-        print(f"Creating {block.name} layer")
+        self.text = f"Creating {block.name} layer"
+        print(self.text)
         for i in range(heighest,self.rows):
             for j in range(size):
                 randNum = random.randint(0,1000000)
@@ -28,21 +30,24 @@ class Terrain(object):
                     L[i][j] = copy.copy(block)
                 x -= 1
         
-    def createMap(self,L):#L = list of tuples of information
+    def createMap(self,L,J):#L = list of tuples of information
         for layer,block in L:
             self.createLevel(layer,block,self.map,self.cols)
         self.caveGen(self.map, 10) #increasing this number increases the "smoothness" of caves
+        self.sprinkle(J)
             
     def caveGen(self,L,passes): #example 7 - https://www.cs.cmu.edu/~112/notes/student-tp-guides/Terrain.pdf
         for row in range(80,len(L)-1): #80 because highest dirt is 75 and some top layer should be preserved
             for col in range(len(L[0])):
                 if L[row][col].solid and random.randint(0,100)<=37: #hole randomness
                     L[row][col] = Block("background",1,"gray65",False,False)
-        print("Generating Caves...")
+        self.text= "Generating Caves..."
+        print(self.text)
         #I used a set for its attribute of being unordered and cause its fast
         possible = set([(1,0),(1,1),(1,-1),(0,-1),(0,1),(-1,0),(-1,-1),(-1,1)])          
         for i in range(passes):
-            print(f"Smoothing Caves: {(i+1)*10}%")
+            self.text = f"Smoothing Caves: {(i+1)*10}%"
+            print(self.text)
             for row in range(80,len(L)-1):
                 for col in range(1,len(L[0])-1):
                     air = 0
@@ -58,8 +63,36 @@ class Terrain(object):
                                 not L[row][col].name == "sky"):
                                 L[row][col] = copy.deepcopy(L[row+drow][col+dcol])
                                 break
-        print("Cave Gen complete")
-                            
+        self.text = "Cave Gen complete"
+        print(self.text)
+            
+    def createOre(self,top,bottom,ore,L,size):
+        self.text = f"Sprinkling in {ore.name}"
+        print(self.text)
+        for row in range(top,bottom):
+            for col in range(1,size-1):
+                possible = [(1,0),(1,1),(1,-1),(0,-1),(0,1),(-1,0),(-1,-1),(-1,1)]
+                random.shuffle(possible)
+                score = 0
+                for drow,dcol in possible:
+                    if (isinstance(L[row+drow][col+dcol],Ore) or 
+                        not L[row+drow][col+dcol].solid):
+                        score+=1
+                randNum = random.randint(0,100)
+                if score == 0 and randNum<2:
+                    L[row][col] = copy.deepcopy(ore)
+                    for drow,dcol in possible:
+                        if L[row+drow][col+dcol].solid:
+                            L[row+drow][col+dcol] = copy.deepcopy(ore)
+                            randNum -= 1
+                        if randNum <= 0:
+                            break
+                        
+    def sprinkle(self,L):
+        for top,bottom,ore in L:
+            self.createOre(top,bottom,ore,self.map,self.cols)
+                
+                
     
     def createChunk(self,size,L):
         chunk = [([Block("sky",0,"SkyBlue1",False,False)]*size) for row in range(self.rows)]

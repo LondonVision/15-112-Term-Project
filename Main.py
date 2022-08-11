@@ -14,14 +14,17 @@ def appStarted(app):
               (85,Block("stone",10,"light slate gray")),
               (125,Block("deep stone",20,"gray20")),
               (180,Block("bedrock",1000,"gray4",True,False))]
+    app.ores = [(90,110,Ore("iron ore",15,"MistyRose2")),
+                (100,125,Ore("gold ore",20,"goldenrod4")),
+                (125,180,Ore("diamond ore",25,"DodgerBlue4"))]
     app.blockToughDict = {"dirt":5,"stone":10,"deep stone":20}
     app.world = Terrain(app,app.rows,app.cols)
-    app.world.createMap(app.layers)
+    app.world.createMap(app.layers,app.ores)
+    app.world.text = "Game Launching..."
     print("Game Launching...")
     app.player = Player(app)
     app.player.refreshPlayerVision(app)
     app.invOpen = False
-    
     app.cellWidth = app.width / app.player.visCols
     app.timerDelay = 98
     
@@ -89,7 +92,7 @@ def mousePressed(app,event):
             app.player.mine(app,row,col)
         else:
             app.player.placeBlock(app,row,col)
-
+    
 def moveItem(app,L,row,col):
     if app.player.selected == None:
         app.player.selected = L[row][col]
@@ -132,8 +135,8 @@ def getCellBounds(app, row, col,width): #same link as above
     y0 = row * width
     y1 = (row+1) * width
     return (x0, y0, x1, y1)      
-            
+          
 def redrawAll(app,canvas):
-    app.player.redraw(app,canvas)
+    app.player.redraw(app,canvas)   
 
 runApp(width=600, height=600)
