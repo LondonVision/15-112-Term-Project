@@ -17,7 +17,10 @@ def appStarted(app):
     app.ores = [(90,110,Ore("iron ore",15,"MistyRose2")),
                 (100,125,Ore("gold ore",20,"goldenrod4")),
                 (125,180,Ore("diamond ore",25,"DodgerBlue4"))]
-    app.blockToughDict = {"dirt":5,"stone":10,"deep stone":20}
+    app.blockToughDict = {"dirt":5,"stone":10,"deep stone":20,
+                          "iron ore":15,"gold ore":20,"diamond ore":25,
+                          "packed dirt":10,"dirt stone":15,
+                          "iron":20,"gold":10,"diamond":25}
     app.world = Terrain(app,app.rows,app.cols)
     app.world.createMap(app.layers,app.ores)
     app.world.text = "Game Launching..."
