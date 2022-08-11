@@ -8,7 +8,7 @@ import random,sys
 def appStarted(app):
     sys.setrecursionlimit(1500) #https://stackoverflow.com/questions/3323001/what-is-the-maximum-recursion-depth-in-python-and-how-to-increase-it
     app.rows = 200
-    app.cols = 1000
+    app.cols = 100 #!1000
     
     app.layers = [(75,Block("dirt",5,"tan4")),
               (85,Block("stone",10,"light slate gray")),
@@ -57,6 +57,17 @@ def keyPressed(app, event):
             app.player.hotbarSlot = 9
         else:
             app.player.hotbarSlot = int(event.key)-1
+    row,col = int((app.mouseY) / app.cellWidth/2),int((app.mouseX) / app.cellWidth/2)
+    print(row,col)
+    if (event.key == "x" and app.player.selected == None and
+        row <= len(app.player.inventory) and col <= len(app.player.inventory[0]) and
+        isinstance(app.player.inventory[row][col],tuple) and app.player.inventory[row][col][1]>1):
+        print("passed")
+        block,amount = app.player.inventory[row][col]
+        newAmount = amount//2
+        amount -= newAmount
+        app.player.inventory[row][col] = (block,amount)
+        app.player.selected = (block,newAmount)        
 
 def mouseMoved(app,event):
     app.mouseX = event.x
@@ -122,6 +133,8 @@ def checkCraftingGrid(app):
                 result += app.player.craftingGrid[row][col][0].name
     if result in app.craft.recipes:
         app.player.output = app.craft.recipes[result]
+    else:
+        app.player.output = None
 
 def getCell(app, x, y): #https://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
     # aka "viewToModel"
