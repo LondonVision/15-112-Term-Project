@@ -8,15 +8,15 @@ import random,sys
 def appStarted(app):
     sys.setrecursionlimit(1500) #https://stackoverflow.com/questions/3323001/what-is-the-maximum-recursion-depth-in-python-and-how-to-increase-it
     app.rows = 200
-    app.cols = 100 #!1000
+    app.cols = 1000 #!1000
     
     app.layers = [(75,Block("dirt",5,"tan4")),
               (85,Block("stone",10,"light slate gray")),
               (125,Block("deep stone",20,"gray20")),
               (180,Block("bedrock",1000,"gray4",True,False))]
-    app.ores = [(90,110,Ore("iron ore",15,"MistyRose2")),
-                (100,125,Ore("gold ore",20,"goldenrod4")),
-                (125,180,Ore("diamond ore",25,"DodgerBlue4"))]
+    app.ores = [(90,120,Ore("iron ore",15,"MistyRose2")),
+                (120,150,Ore("gold ore",20,"goldenrod4")),
+                (150,180,Ore("diamond ore",25,"DodgerBlue4"))]
     app.blockToughDict = {"dirt":5,"stone":10,"deep stone":20,
                           "iron ore":15,"gold ore":20,"diamond ore":25,
                           "packed dirt":10,"dirt stone":15,
@@ -58,11 +58,9 @@ def keyPressed(app, event):
         else:
             app.player.hotbarSlot = int(event.key)-1
     row,col = int((app.mouseY) / app.cellWidth/2),int((app.mouseX) / app.cellWidth/2)
-    print(row,col)
     if (event.key == "x" and app.player.selected == None and
         row <= len(app.player.inventory) and col <= len(app.player.inventory[0]) and
         isinstance(app.player.inventory[row][col],tuple) and app.player.inventory[row][col][1]>1):
-        print("passed")
         block,amount = app.player.inventory[row][col]
         newAmount = amount//2
         amount -= newAmount

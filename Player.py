@@ -1,5 +1,6 @@
 import time,copy
 from Block import*
+from cmu_112_graphics import *
 class Player(object):
     def __init__(self,app):
         self.health = 20
@@ -20,16 +21,37 @@ class Player(object):
     
         self.visable = [([0]*self.visCols) for row in range(self.visRows)]
         
+        self.playerSprite = app.loadImage('playerSprite.png')
+        self.playerSprite = app.scaleImage(self.playerSprite,1/44)
+
+        
     def refreshPlayerVision(self,app):
-        # start = time.time()
-        for visRow in range (self.visRows):
-            for visCol in range (self.visCols):
-                posRow = self.row + visRow - self.visRows//2
-                posCol = self.col + visCol - self.visCols//2
-                # print(f"1: {(posRow-self.visRows//2)}\n2: {(posCol-self.visCols//2)}")   
-                self.visable[visRow][visCol] = app.world.map[posRow][posCol]
-        #TODO get top and bottom of screen not crashing
-        # print(f"time taken = {(time.time()-start)*1000//1}")
+        if self.row + self.visRows//2 >= len(app.world.map):
+            var = self.visRows//2+(len(app.world.map)-self.row)
+            for visRow in range (var):
+                for visCol in range (self.visCols):
+                    posRow = self.row + visRow - self.visRows//2
+                    posCol = self.col + visCol - self.visCols//2
+                    self.visable[visRow][visCol] = app.world.map[posRow][posCol]
+            for newrow in range (var,self.visRows):
+                for newcol in range (self.visCols):
+                    self.visable[newrow][newcol] = Block("bedrock",1000,"gray4",True,False)
+        elif self.row - self.visRows//2 <= 0:
+            var = self.visRows//2-(self.row)
+            for visRow in range (var,self.visRows):
+                for visCol in range (self.visCols):
+                    posRow = self.row + visRow - self.visRows//2
+                    posCol = self.col + visCol - self.visCols//2
+                    self.visable[visRow][visCol] = app.world.map[posRow][posCol]
+            for newrow in range (var):
+                for newcol in range (self.visCols):
+                    self.visable[newrow][newcol] = Block("sky",0,"SkyBlue1",False,False)
+        else:        
+            for visRow in range (self.visRows):
+                for visCol in range (self.visCols):
+                    posRow = self.row + visRow - self.visRows//2
+                    posCol = self.col + visCol - self.visCols//2
+                    self.visable[visRow][visCol] = app.world.map[posRow][posCol]
             
     def isPositionLegal(self,app):
         if app.world.map[self.row][self.col].solid:
@@ -37,10 +59,10 @@ class Player(object):
         return True 
     
     def move(self,app,dx):
-        if self.col+len(app.world.map[100]) <= len(app.world.map[0])+20 :
+        if self.col <= self.visCols//2:
             app.world.expandMapLeft(app)
-            self.col += 1000
-        if self.col-len(app.world.map[100]) >= -20:
+            self.col += 100
+        if self.col-len(app.world.map[0]) >= -20:
             app.world.expandMapRight(app)
         
         self.col += dx
@@ -80,7 +102,7 @@ class Player(object):
         # print(f"row:{locRow} | col:{locCol}")
         # print(app.world.map[locRow][locCol].tough)
         if app.world.map[locRow][locCol].mineable:
-            app.world.map[locRow][locCol].tough -= 1
+            app.world.map[locRow][locCol].tough -= 1 #!1
         if app.world.map[locRow][locCol].tough <= 0:
             temp = app.world.map[locRow][locCol].drops
             temp.tough = app.blockToughDict.get(temp.name)
@@ -118,7 +140,7 @@ class Player(object):
         # canvas.create_rectangle(app.player.x-w,app.player.y-w,
                                 # app.player.x+w,app.player.y+w,fill="red")
         x0,y0,x1,y1 = self.getCellBounds(app,20,20,app.cellWidth)
-        canvas.create_rectangle(x0,y0,x1,y1,fill="red")
+        canvas.create_image((x0+x1)/2,(y0+y1)/2,image=ImageTk.PhotoImage(self.playerSprite))
         
     def drawCoords(self,app,canvas):
         canvas.create_text(app.width/2,0,

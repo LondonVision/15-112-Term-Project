@@ -34,7 +34,9 @@ class Terrain(object):
         for layer,block in L:
             self.createLevel(layer,block,self.map,self.cols)
         self.caveGen(self.map, 10) #increasing this number increases the "smoothness" of caves
-        self.sprinkle(J)
+        self.sprinkle(self.map,J)
+        for col in range(len(self.map[0])):
+            self.map[len(self.map)-1][col] = Block("bedrock",1000,"gray4",True,False)
             
     def caveGen(self,L,passes): #example 7 - https://www.cs.cmu.edu/~112/notes/student-tp-guides/Terrain.pdf
         for row in range(80,len(L)-1): #80 because highest dirt is 75 and some top layer should be preserved
@@ -88,21 +90,22 @@ class Terrain(object):
                         if randNum <= 0:
                             break
                         
-    def sprinkle(self,L):
-        for top,bottom,ore in L:
-            self.createOre(top,bottom,ore,self.map,self.cols)
+    def sprinkle(self,L,J):
+        for top,bottom,ore in J:
+            self.createOre(top,bottom,ore,L,len(L[0]))
                 
-                
-    
-    def createChunk(self,size,L):
+    def createChunk(self,size,L,J):
         chunk = [([Block("sky",0,"SkyBlue1",False,False)]*size) for row in range(self.rows)]
         for layer,block in L:
             self.createLevel(layer, block, chunk, size)
         self.caveGen(chunk, 10)
+        self.sprinkle(chunk,J)
+        for col in range(len(chunk[0])):
+            self.map[len(chunk)-1][col] = Block("bedrock",1000,"gray4",True,False)
         return chunk
         
     def expandMapLeft(self,app):
-        chunk = self.createChunk(100,app.layers)
+        chunk = self.createChunk(100,app.layers,app.ores)
         for i in range(self.rows):
             self.insertRow(chunk[i],self.map[i])
             
@@ -114,6 +117,6 @@ class Terrain(object):
             return self.insertRow(L1[:-1],L2)
         
     def expandMapRight(self,app):
-        chunk = self.createChunk(100,app.layers)
+        chunk = self.createChunk(100,app.layers,app.ores)
         for i in range(self.rows):
             self.map[i].extend(chunk[i])
