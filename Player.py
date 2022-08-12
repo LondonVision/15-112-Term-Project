@@ -218,9 +218,9 @@ class Player(object):
     def drawOutput(self,app,canvas):
         block,amount = None,0
         if isinstance(self.output,tuple):
-            block,amount = self.output
+            block,amount = self.output  
         color = "LightBlue3"
-        if not block == None:
+        if not block == None:  
             color = block.color
         if amount == 0:
             amount = ""
@@ -228,7 +228,6 @@ class Player(object):
         canvas.create_rectangle(x0,y0,x1,y1,fill="LightBlue3")
         canvas.create_rectangle(x0+4,y0+4,x1-4,y1-4,fill=color,outline=color)
         canvas.create_text((x0+x1)/2,(y0+y1)/2,text=amount)
-        
         
     def getCellBounds(self,app, row, col,width): #same link as above
         # aka "modelToView"

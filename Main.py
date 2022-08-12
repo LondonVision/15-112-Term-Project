@@ -116,7 +116,7 @@ def moveItem(app,L,row,col):
     elif (not app.player.selected == None and not L[row][col] == None
           and app.player.selected[0]==L[row][col][0]):
         L[row][col] = (app.player.selected[0],
-                                             app.player.selected[1]+L[row][col][1])
+                        app.player.selected[1]+L[row][col][1])
         app.player.selected = None
 
 #I used this for the idea to turn the grid into a string
