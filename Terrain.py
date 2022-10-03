@@ -37,6 +37,7 @@ class Terrain(object):
         self.sprinkle(self.map,J)
         for col in range(len(self.map[0])):
             self.map[len(self.map)-1][col] = Block("bedrock",1000,"gray4",True,False)
+        self.createGrass(self.map)    
             
     def caveGen(self,L,passes): #example 7 - https://www.cs.cmu.edu/~112/notes/student-tp-guides/Terrain.pdf
         for row in range(80,len(L)-1): #80 because highest dirt is 75 and some top layer should be preserved
@@ -93,7 +94,14 @@ class Terrain(object):
     def sprinkle(self,L,J):
         for top,bottom,ore in J:
             self.createOre(top,bottom,ore,L,len(L[0]))
-                
+    
+    def createGrass(self,L):
+        print("Adding grass")
+        for row in range(75,125):
+            for col in range(len(L[0])):
+                if L[row][col].name == "dirt" and L[row-1][col].name == "sky":
+                    L[row][col] = Block("grass",5,"green3")
+                    
     def createChunk(self,size,L,J):
         chunk = [([Block("sky",0,"SkyBlue1",False,False)]*size) for row in range(self.rows)]
         for layer,block in L:
@@ -102,6 +110,7 @@ class Terrain(object):
         self.sprinkle(chunk,J)
         for col in range(len(chunk[0])):
             self.map[len(chunk)-1][col] = Block("bedrock",1000,"gray4",True,False)
+        self.createGrass(chunk)
         return chunk
         
     def expandMapLeft(self,app):

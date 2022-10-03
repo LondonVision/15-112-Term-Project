@@ -8,7 +8,7 @@ import random,sys
 def appStarted(app):
     sys.setrecursionlimit(1500) #https://stackoverflow.com/questions/3323001/what-is-the-maximum-recursion-depth-in-python-and-how-to-increase-it
     app.rows = 200
-    app.cols = 1000 #!1000
+    app.cols = 100 #!1000
     
     app.layers = [(75,Block("dirt",5,"tan4")),
               (85,Block("stone",10,"light slate gray")),
@@ -20,7 +20,7 @@ def appStarted(app):
     app.blockToughDict = {"dirt":5,"stone":10,"deep stone":20,
                           "iron ore":15,"gold ore":20,"diamond ore":25,
                           "packed dirt":10,"dirt stone":15,
-                          "iron":20,"gold":10,"diamond":25}
+                          "iron":20,"gold":10,"diamond":25,"grass":5}
     app.world = Terrain(app,app.rows,app.cols)
     app.world.createMap(app.layers,app.ores)
     app.world.text = "Game Launching..."

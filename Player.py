@@ -132,8 +132,9 @@ class Player(object):
         for row in range(len(self.visable)):
             for col in range(len(self.visable[0])):
                 color = self.visable[row][col].color
+                outline = self.visable[row][col].color
                 x0,y0,x1,y1 = self.getCellBounds(app,row,col,app.cellWidth)
-                canvas.create_rectangle(x0,y0,x1,y1,fill=color)
+                canvas.create_rectangle(x0,y0,x1,y1,fill=color,outline=outline)
 
     def drawPlayer(self,app,canvas):
         # w = app.cellWidth/2
