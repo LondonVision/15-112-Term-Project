@@ -102,12 +102,15 @@ class Player(object):
         # print(f"row:{locRow} | col:{locCol}")
         # print(app.world.map[locRow][locCol].tough)
         if app.world.map[locRow][locCol].mineable:
-            app.world.map[locRow][locCol].tough -= 1 #!1
-        if app.world.map[locRow][locCol].tough <= 0:
-            temp = app.world.map[locRow][locCol].drops
-            temp.tough = app.blockToughDict.get(temp.name)
-            self.addBlockToInventory(copy.deepcopy(temp))
-            app.world.map[locRow][locCol] = Block("background",1,"gray65",False,False)
+            app.world.map[locRow][locCol].tough -= 1 #!this should be 1
+            if app.world.map[locRow][locCol].tough <= 0:
+                temp = app.world.map[locRow][locCol].drops
+                temp.tough = app.blockToughDict.get(temp.name)
+                self.addBlockToInventory(copy.deepcopy(temp))
+                if locRow<90:
+                    app.world.map[locRow][locCol] = Block("sky",0,"SkyBlue1",False,False)
+                else:
+                    app.world.map[locRow][locCol] = Block("background",1,"gray65",False,False)
         self.refreshPlayerVision(app)
     
     def placeBlock(self,app,row,col):
@@ -132,7 +135,7 @@ class Player(object):
         for row in range(len(self.visable)):
             for col in range(len(self.visable[0])):
                 color = self.visable[row][col].color
-                outline = self.visable[row][col].color
+                outline = color
                 x0,y0,x1,y1 = self.getCellBounds(app,row,col,app.cellWidth)
                 canvas.create_rectangle(x0,y0,x1,y1,fill=color,outline=outline)
 
